@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OfficeOpenXml;
+using RiderResouceImporter.Interfaces;
 
 namespace RiderResouceImporter
 {
-    public class RiderImporterService
+    public class RiderImporterService : IResourceFileImporter
     {
         public ImportResult Import(string path, List<string> languages)
         {

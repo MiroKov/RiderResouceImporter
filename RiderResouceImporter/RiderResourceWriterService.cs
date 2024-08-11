@@ -2,10 +2,11 @@
 using System.IO;
 using System.Linq;
 using System.Resources.NetStandard;
+using RiderResouceImporter.Interfaces;
 
 namespace RiderResouceImporter
 {
-    public class RiderResourceWriterService
+    public class RiderResourceWriterService : IResourceFileWriter
     {
         public void Write(ImportResult result, string rootPath)
         {
