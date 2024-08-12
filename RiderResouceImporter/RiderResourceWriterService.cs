@@ -8,18 +8,22 @@ namespace RiderResouceImporter
 {
     public class RiderResourceWriterService : IResourceFileWriter
     {
-        public void Write(ImportResult result, string rootPath)
+        public WriteResult Write(ImportResult import, string rootPath)
         {
-            foreach (var resourceFile in result.Resources)
+            var result = new WriteResult();
+            foreach (var resourceFile in import.Resources)
             {
                 if (resourceFile.DefaultPath == null) continue;
                 var basePath = Path.GetFullPath(Path.Combine(rootPath, resourceFile.DefaultPath + ".resx"));
-                ProcessResourceFile(resourceFile, basePath);
+                result.Resources.AddRange(ProcessResourceFile(resourceFile, basePath));
             }
+
+            return result;
         }
 
-        private void ProcessResourceFile(ResourceFile newResourceFile, string basePath)
+        private List<WriteResourceFile> ProcessResourceFile(ResourceFile newResourceFile, string basePath)
         {
+            var result = new List<WriteResourceFile>();
             var directoryPath = Path.GetDirectoryName(basePath);
             if (!string.IsNullOrEmpty(directoryPath))
                 Directory.CreateDirectory(directoryPath);
@@ -29,11 +33,15 @@ namespace RiderResouceImporter
             {
                 var translationExtension = translation.Contains(Constants.DefaultCulture) ? string.Empty : $"{translation}.";
                 var tempResourceFileName = basePath.Substring(0, basePath.Length - 4) + translationExtension + "temp." + "resx";
-                var oldResourceFileName = basePath.Substring(0, basePath.Length - 4) + translationExtension + "resx";
-                WriteTempResourceFile(tempResourceFileName, newResourceFile.Entries);
-                DeleteOldResourceFile(oldResourceFileName);
-                RenameNewResourceFile(tempResourceFileName, oldResourceFileName);
+                var targetResourceFileName = basePath.Substring(0, basePath.Length - 4) + translationExtension + "resx";
+                var entries = newResourceFile.Entries.Where(_ => _.Language == translation).ToList();
+                result.Add(new WriteResourceFile(translation, targetResourceFileName, entries));
+                WriteTempResourceFile(tempResourceFileName, entries);
+                DeleteOldResourceFile(targetResourceFileName);
+                RenameNewResourceFile(tempResourceFileName, targetResourceFileName);
             }
+
+            return result;
         }
 
         private void RenameNewResourceFile(string tempResourceFileName, string oldResourceFileName)

@@ -16,7 +16,7 @@ public partial class MainWindow : Window
         this.resourceFileWriter = resourceFileWriter;
         this.resourceFileImporter = resourceFileImporter;
         InitializeComponent();
-        LanguagesTextBox.Text = "de;en;";
+        LanguagesTextBox.Text = $"{Constants.DefaultCulture};en;";
     }
 
     private void ExcelFileButton_Click(object sender, RoutedEventArgs e)
@@ -76,14 +76,14 @@ public partial class MainWindow : Window
             return;
         }
 
-        var languages = LanguagesTextBox.Text.Split(separator, StringSplitOptions.RemoveEmptyEntries).Where(_ => _.Length == 2).ToList();
+        var languages = LanguagesTextBox.Text.Split(separator, StringSplitOptions.RemoveEmptyEntries)
+            .Where(_ => _.Length == 2 || _ == Constants.DefaultCulture).ToList();
         if (!languages.Any())
         {
             MessageBox.Show("Please specify the resources languages (ISOZ2) ", "Enter translation languages");
             return;
         }
 
-        languages.Add(Constants.DefaultCulture);
         var importResult = resourceFileImporter.Import(ExcelFileTextBox.Text, languages);
         resourceFileWriter.Write(importResult, ExportRootPathTextBox.Text);
         MessageBox.Show("Import successful");

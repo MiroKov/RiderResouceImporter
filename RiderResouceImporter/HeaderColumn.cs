@@ -1,8 +1,11 @@
-﻿namespace RiderResouceImporter
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace RiderResouceImporter
 {
+    [ExcludeFromCodeCoverage]
     public class HeaderColumn(string text, int start)
     {
-        public string Text { get; set; } = text;
-        public int Start { get; set; } = start;
+        public string Text { get; } = text;
+        public int Start { get; } = start;
     }
 }

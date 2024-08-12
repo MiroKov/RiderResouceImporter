@@ -25,7 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Resources.xlsx">
+      <None Update="TestResources.xlsx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

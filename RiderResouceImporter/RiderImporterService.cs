@@ -34,19 +34,19 @@ namespace RiderResouceImporter
                 .Where(_ => languagesToImport.Contains(_.Text, StringComparer.OrdinalIgnoreCase)).ToList();
             var defaultCultureIndex = headers.First(_ => _.Text == Constants.DefaultCulture).Start;
             var resourceFiles = new List<ResourceFile>();
-            for (var i = 2; i < sortRange.Rows + 1; i++)
+            for (var i = 2; i < sortRange.Rows + 2; i++)
             {
-                var defaultCulture = sortRange.FirstOrDefault(_ => _.Start.Column == defaultCultureIndex && _.Start.Row == i)?.Text;
                 var resourceBasePath = sortRange.FirstOrDefault(_ => _.Start.Column == 1 && _.Start.Row == i)?.Text; // Resource path
+                var defaultCulture = sortRange.FirstOrDefault(_ => _.Start.Column == defaultCultureIndex && _.Start.Row == i)?.Text;
                 var name = sortRange.FirstOrDefault(_ => _.Start.Column == 2 && _.Start.Row == i)?.Text; // Name
-                var resourceFile = new ResourceFile(resourceBasePath);
+                var resourceFile = resourceFiles.FirstOrDefault(_ => _.DefaultPath == resourceBasePath) ?? new ResourceFile(resourceBasePath);
                 foreach (var headerColumn in headers)
                 {
                     var translation = sortRange.FirstOrDefault(_ => _.Start.Column == headerColumn.Start && _.Start.Row == i)?.Text;
-                    resourceFile.AddEntry(name,translation, headerColumn.Text, defaultCulture);
+                    resourceFile.AddEntry(name, translation, headerColumn.Text, defaultCulture);
                 }
-
-                resourceFiles.Add(resourceFile);
+                if (resourceFile.Entries.Count <= headers.Count)
+                    resourceFiles.Add(resourceFile);
             }
 
             return resourceFiles;
